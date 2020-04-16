@@ -1,0 +1,132 @@
+*Para que el do-file funcione, debe descargar las bases de la página del DANE
+*Posteriormente cambie el nombre de los meses por números 01, 02, 03, y así sucesivamente.
+*Seleccione una carpeta donde tiene todo y establezca su directorio de trabajo.
+*Si tiene que cambiar un año en el do-file o el nombre de un archivo, puede usar reemplazar en Word o su editor de texto favorito
+*Corra el script
+
+*Cabecera Características Generales
+	cd "C:\Users\Alberto Castillo\Google Drive\OLDS\GEIH 2017"
+use "01\Cabecera - Características generales (Personas).dta"
+
+foreach folder in 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Cabecera - Características generales (Personas).dta", force
+}
+
+foreach folder in 01 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Resto - Características generales (Personas).dta", force
+}
+
+save "2017 Características Generales.dta", replace
+clear
+
+*Desocupados
+use "01\Cabecera - Desocupados.dta"
+
+foreach folder in 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Cabecera - Desocupados.dta", force
+}
+
+foreach folder in 01 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Resto - Desocupados.dta", force
+}
+save "2017 Desocupados.dta", replace
+clear
+
+*Fuerza de Trabajo
+use "01\Cabecera - Fuerza de Trabajo.dta"
+
+foreach folder in 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Cabecera - Fuerza de Trabajo.dta", force
+}
+
+foreach folder in 01 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Resto - Fuerza de Trabajo.dta", force
+}
+save "2017 Fuerza de Trabajo.dta", replace
+clear
+
+*Inactivos
+use "01\Cabecera - Inactivos.dta"
+
+foreach folder in 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Cabecera - Inactivos.dta", force
+}
+
+foreach folder in 01 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Resto - Inactivos.dta", force
+}
+save "2017 Inactivos.dta", replace
+clear
+
+*Ocupados
+use "01\Cabecera - Ocupados.dta"
+
+foreach folder in 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Cabecera - Ocupados.dta", force
+}
+
+foreach folder in 01 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Resto - Ocupados.dta", force
+}
+save "2017 Ocupados.dta", replace
+clear
+
+*Otras actividades y ayudas en la semana
+use "01\Cabecera - Otras actividades y ayudas en la semana.dta"
+
+foreach folder in 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Cabecera - Otras actividades y ayudas en la semana.dta", force
+}
+
+foreach folder in 01 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Resto - Otras actividades y ayudas en la semana.dta", force
+}
+save "2017 Otras actividades y ayudas en la semana.dta", replace
+clear
+
+*Otras actividades y ayudas en la semana
+use "01\Cabecera - Otros ingresos.dta"
+
+foreach folder in 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Cabecera - Otros ingresos.dta", force
+}
+
+foreach folder in 01 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Resto - Otros ingresos.dta", force
+}
+save "2017 Otros ingresos.dta", replace
+clear
+
+
+*Vivienda y Hogares
+use "01\Cabecera - Vivienda y Hogares.dta"
+
+foreach folder in 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Cabecera - Vivienda y Hogares.dta", force
+}
+
+foreach folder in 01 02 03 04 05 06 07 08 09 10 11 12{
+	append using "`folder'\Resto - Vivienda y Hogares.dta", force
+}
+save "2017 Vivienda y Hogares.dta", replace
+clear
+
+
+
+
+***************** Merge
+
+use "2017 Características Generales.dta"
+merge m:1 directorio secuencia_p using "2017 Vivienda y Hogares.dta", generate(_vivienda) 
+merge 1:1 directorio secuencia_p orden hogar using "2017 Desocupados.dta", generate(_desocupados) 
+merge 1:1 directorio secuencia_p orden hogar using "2017 Fuerza de Trabajo.dta", generate(_fuerza) 
+merge 1:1 directorio secuencia_p orden hogar using "2017 Ocupados.dta", generate(_ocupados) 
+merge 1:1 directorio secuencia_p orden hogar using "2017 Inactivos.dta", generate(_inactivos) 
+merge 1:1 directorio secuencia_p orden hogar using "2017 Otros ingresos.dta", generate(_oingresos) 
+merge 1:1 directorio secuencia_p orden hogar using "2017 Otras actividades y ayudas en la semana.dta", generate(_oactividades) 
+merge 1:1 directorio secuencia_p orden using "Total_Fact_expansión.dta", generate(_factor)
+save "2017 Completa.dta", replace
+
+**************** Compresión
+destring, replace
+compress
